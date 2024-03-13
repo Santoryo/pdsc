@@ -7,12 +7,18 @@
 #define REFRESH_RATE 16.666666
 
 
-#define VERTICES 6
+#define VERTICES 3
 #define ALPHA 360.0 / VERTICES
+
+#define MAX_RADIUS 500
+#define MIN_RADIUS 100
+
+#define STEP 0.1
+
+float beta = 0;
 
 int radius = 100;
 int centerX, centerY;
-int beta = 0;
 int event;
 int direction = 1;
 
@@ -47,17 +53,20 @@ void drawPolygon()
 
 void updateRotation()
 {
-	beta++;
-	beta = beta % 360;
+	beta = beta + STEP;
+	if(beta >= 360.0)
+	{
+		beta -= 360.0;
+	}
 }
 
 void updateSize()
 {
-	if(radius >= 500)
+	if(radius >= MAX_RADIUS)
 	{
 		direction = -1;
 	}
-	else if(radius <= 100)
+	else if(radius <= MIN_RADIUS)
 	{
 		direction = 1;
 	}
