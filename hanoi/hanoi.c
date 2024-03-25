@@ -6,20 +6,24 @@
 #define REFRESH_RATE 16.666666
 #define PADDING 50
 
-#define DISKS 9
+#define DISKS 12
 #define STAKES 3
 #define DIFFICULTY 5
-#define RING_WIDTH 20
+#define RING_WIDTH 200
 #define RING_HEIGHT 20
+
+#define STAKE_WIDTH 20
 
 
 int centerX, centerY;
 int event;
 int containerWidth;
 
-int keyBuffer[2] = {0, 0};
+int state = 0;
+int keyBuffer[2] = {-1, -1};
+int stakes[STAKES][DISKS];
 
-int stakes[STAKES][DISKS] = {	{5, 4, 3, 2, 1}, {5, 4, 3, 2, 1}, {0}	};
+float y = 0;
 
 struct Rectangle
 {
@@ -31,6 +35,15 @@ struct Rectangle
 };
 
 struct Rectangle background;
+
+void setupStakes()
+{
+	for(int stake = 0; stake < DISKS; stake++)
+	{
+		printf("%i", stake);
+		stakes[0][stake] = DISKS - stake;
+	}
+}
 
 void updateScreen()
 {
@@ -53,35 +66,26 @@ void setupVariables()
 
 void draw🛕()
 {
-    int elementWidth = 20;
-    int totalWidth = background.x2 - background.x1;
-    int totalSpacing = totalWidth - STAKES * elementWidth; 
-    int spaceBetween = totalSpacing / (2 * STAKES + 1);
-
     for (int i = 0; i < STAKES; i++)
     {
-        int x1 = background.x1 + spaceBetween * (2 * i + 1) + elementWidth * i;
-        int x2 = x1 + elementWidth;
+        int x1 = background.x1 + (i * background.spacing) + STAKE_WIDTH * i + 90;
+        int x2 = x1 + STAKE_WIDTH;
         gfx_filledRect(x1, background.y2, x2, centerY, GREEN);
     }
 }
 
 void drawStakes()
 {
-		int elementWidth = 200;
-    int totalWidth = background.x2 - background.x1;
-    int totalSpacing = totalWidth - STAKES * elementWidth; 
-    int spaceBetween = totalSpacing / (2 * STAKES + 1);
 
     for(int i = 0; i < STAKES; i++)
     {
-        int stakeX = background.x1 + spaceBetween * (2 * i + 1) + elementWidth * i;
+        int stakeX = background.x1 + (i * background.spacing) + STAKE_WIDTH * i;
 
         for(int j = 0; j < DISKS; j++)
         {
             if(stakes[i][j] != 0) {
-                int diskWidth = stakes[i][j] * elementWidth / DISKS; // The width of the disk is proportional to its size
-                int diskX = stakeX + (elementWidth - diskWidth) / 2; // The disk is centered on the stake
+                int diskWidth = stakes[i][j] * RING_WIDTH / DISKS; 
+                int diskX = stakeX + RING_WIDTH / 2 - diskWidth / 2;
                 int diskY = background.y2 - (j + 1) * RING_HEIGHT;
                 gfx_filledRect(diskX, diskY, diskX + diskWidth, diskY + RING_HEIGHT, BLUE);
             }
@@ -91,7 +95,6 @@ void drawStakes()
 
 
 void moveDisk(int fromStake, int toStake) {
-    // Find the top disk on the source stake
     int topDisk = 0;
     int topDiskIndex = 0;
     for(int j = DISKS - 1; j >= 0; j--) {
@@ -106,7 +109,6 @@ void moveDisk(int fromStake, int toStake) {
     for(int j = DISKS - 1; j >= 0; j--) {
         if(stakes[toStake][j] != 0) {
             if(stakes[toStake][j] < topDisk) {
-                // The disk on the destination stake is smaller, so the move is not allowed
                 return;
             }
             break;
@@ -114,6 +116,7 @@ void moveDisk(int fromStake, int toStake) {
     }
 
     // The move is allowed, so remove the disk from the source stake
+		moveUp(topDiskIndex, fromStake, toStake);
     stakes[fromStake][topDiskIndex] = 0;
 
     // Place the disk on top of the destination stake
@@ -127,26 +130,95 @@ void moveDisk(int fromStake, int toStake) {
 
 void handleKeys(char key)
 {
-	// if(!(key <= 49 && key >= 49 + STAKES)) return;
+	int target = key - 49;
+	if(target < 0 && target > STAKES) return;
 
-	int target = key-48;
 
-	if(keyBuffer[0] != 0 && keyBuffer[1] != 0)
-	{
-		moveDisk(keyBuffer[0], keyBuffer[1]);
-	}
-	else if(keyBuffer[0] == 0) {
-		keyBuffer[0] == target;
+	if(keyBuffer[0] == -1) {
+		keyBuffer[0] = target;
 	} 
-	else if(keyBuffer[1] == 0) {
-		keyBuffer[1] == target;
+	else if(keyBuffer[1] == -1) {
+		keyBuffer[1] = target;
+		moveDisk(keyBuffer[0], keyBuffer[1]);
+		keyBuffer[0] = -1;
+		keyBuffer[1] = -1;
 	}
 
-	printf("KEY BUFFER: [%i %i] \n", keyBuffer[0], keyBuffer[1]);
+}
 
-	
+void moveUp(int j, int i, int k)
+{
+	float y = background.y1 + (j * RING_HEIGHT);
+	int stakeX = background.x1 + (i * background.spacing) + STAKE_WIDTH * i;
+  int diskWidth = stakes[i][j] * RING_WIDTH / DISKS; 
+  int diskX = stakeX + RING_WIDTH / 2 - diskWidth / 2;
+	int diskY = background.y2 - (j + 1) * RING_HEIGHT;
 
+	int stakeEndpoint = background.x1 + (k * background.spacing) + STAKE_WIDTH * k;
+	int endPointX = stakeEndpoint + RING_WIDTH / 2 - diskWidth / 2;
+	float x = diskX;
 
+	int state = 0;
+
+	while(state == 0)
+	{
+			gfx_filledRect(diskX, diskY + y, diskX + diskWidth, diskY + RING_HEIGHT + y, RED);
+			y -= 4.00;
+			updateScreen();
+			draw🛕();
+			drawStakes();
+			if(diskY + y <= PADDING) { state = 1; }
+	}
+
+	state = 0;
+
+	while(state == 0)
+	{
+			gfx_filledRect(diskX + x, diskY + y, diskX + x + diskWidth, diskY + RING_HEIGHT + y, RED);
+			x += 4.00;
+			updateScreen();
+			draw🛕();
+			drawStakes();
+			if(diskX + x >= endPointX) { state = 1; }
+
+	}  
+
+	state = 0;
+
+	while(state == 0)
+	{
+			gfx_filledRect(diskX + x, diskY + y, diskX + diskWidth + x, diskY + RING_HEIGHT + y, RED);
+			y += 4.00;
+			printf("xdd\n%f", diskY + y);
+			updateScreen();
+			draw🛕();
+			drawStakes();
+			if(diskY + y >= gfx_screenHeight() - PADDING - (RING_HEIGHT * j)) { state = 1; }
+	}
+
+}
+
+void moveTo(int j, int i, int k)
+{
+	float y = PADDING;
+	float x = PADDING;
+	int stakeX = background.x1 + (i * background.spacing) + STAKE_WIDTH * i;
+	int endPoint = background.x1 + (k * background.spacing) + STAKE_WIDTH * k;
+	printf("%i", endPoint);
+  int diskWidth = stakes[i][j] * RING_WIDTH / DISKS; 
+  int diskX = stakeX + RING_WIDTH / 2 - diskWidth / 2;
+	int diskY = background.y2 - (j + 1) * RING_HEIGHT;
+
+	int state = 0;
+	while(state == 0)
+		{
+			gfx_filledRect(diskX + x, diskY + y, diskX + diskWidth + x, diskY + RING_HEIGHT + y, RED);
+			y += 2.0;
+			updateScreen();
+			draw🛕();
+			drawStakes();
+			if(diskX <= endPoint) { state = 1; }
+		} 
 }
 
 int main(int argc, char *argv[])
@@ -156,6 +228,9 @@ int main(int argc, char *argv[])
 		exit(3);
 	}
 
+	setupStakes();
+	setupVariables();
+
 	while (1)
 	{
 		event = gfx_pollkey();
@@ -163,12 +238,10 @@ int main(int argc, char *argv[])
 		{
 			printf("%i", event);
 			handleKeys(event);
-
 		}
 
 
 		updateScreen();
-		setupVariables();
 		draw🛕();
 		drawStakes();
 

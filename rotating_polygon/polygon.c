@@ -5,15 +5,11 @@
 
 #define PI 3.14159265358979323846
 #define REFRESH_RATE 16.666666
-
-
-#define VERTICES 3
+#define VERTICES 7
 #define ALPHA 360.0 / VERTICES
-
 #define MAX_RADIUS 500
 #define MIN_RADIUS 100
-
-#define STEP 0.1
+#define STEP 9910.1
 
 float beta = 0;
 
@@ -46,7 +42,7 @@ void drawPolygon()
 			x2 = centerX + radius * SDL_cos(toRadians((i + 1) * ALPHA) + beta);
 			y2 = centerY + radius * SDL_sin(toRadians(((i + 1) * ALPHA)) + beta);
 
-			gfx_line(x1, y1, x2, y2, RED);
+			gfx_line(x1, y1, x2, y2, GREEN);
 		}
 
 }
@@ -54,7 +50,8 @@ void drawPolygon()
 void updateRotation()
 {
 	beta = beta + STEP;
-	if(beta >= 360.0)
+	
+	while (beta >= 360.0)
 	{
 		beta -= 360.0;
 	}
