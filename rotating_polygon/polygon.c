@@ -86,6 +86,10 @@ int main(int argc, char* argv[])
 		if(event != -1) exit(0);
 
 		updateScreen();
+
+		gfx_filledRect(gfx_screenWidth() - 100, gfx_screenHeight() - 100, gfx_screenWidth(), gfx_screenHeight(), RED);
+
+
 		drawPolygon();
 		updateRotation();
 		updateSize();
