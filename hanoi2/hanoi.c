@@ -4,8 +4,8 @@
 #include "math.h"
 
 // GAME SETTINGS
-#define TOWERS 4
-#define RINGS 2
+#define TOWERS 5
+#define RINGS 6
 
 // SDL CONSTANTS
 #define REFRESH_RATE 16.666666
@@ -38,20 +38,20 @@ int gameCompleted = 0;
 
 void setupStakes()
 {
-  for (int i = 0; i < TOWERS; i++)
+  for (int idx = 0; idx < TOWERS; idx++)
   {
-    stakes[i].topStake = 0;
-    stakes[i].x1 = i * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) - STAKE_WIDTH / 2;
-    stakes[i].x2 = i * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) + STAKE_WIDTH / 2;
-    stakes[i].y1 = gfx_screenHeight() - STAKE_HEIGHT;
-    stakes[i].y2 = gfx_screenHeight();
+    stakes[idx].topStake = 0;
+    stakes[idx].x1 = idx * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) - STAKE_WIDTH / 2;
+    stakes[idx].x2 = idx * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) + STAKE_WIDTH / 2;
+    stakes[idx].y1 = gfx_screenHeight() - STAKE_HEIGHT;
+    stakes[idx].y2 = gfx_screenHeight();
 
-    if (i == 0)
+    if (idx == 0)
     {
-      stakes[i].topStake = RINGS;
+      stakes[idx].topStake = RINGS;
       for (int j = 0; j < RINGS; j++)
       {
-        stakes[i].rings[j] = RINGS - j;
+        stakes[idx].rings[j] = RINGS - j;
       }
     }
   }
