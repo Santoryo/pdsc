@@ -1,7 +1,5 @@
 #include "primlib.h"
 #include <stdlib.h>
-#include <unistd.h>
-#include "math.h"
 
 // GAME SETTINGS
 #define TOWERS 5
@@ -59,9 +57,9 @@ void setupStakes()
 
 void checkWinCondition()
 {
-  for (int i = 1; i < TOWERS; i++)
+  for (int idx = 1; idx < TOWERS; idx++)
   {
-    if (stakes[i].topStake == RINGS)
+    if (stakes[idx].topStake == RINGS)
     {
       gameCompleted = 1;
     }
@@ -70,7 +68,7 @@ void checkWinCondition()
 
 void displayWinMessage()
 {
-  gfx_textout(gfx_screenWidth() / 2 - 50, Y_MAX, "Press ESC to exit or ENTER to restart", WHITE);
+  gfx_textout(gfx_screenWidth() / 2, Y_MAX, "Press ESC to exit or ENTER to restart", WHITE);
 }
 
 void drawStakes()
@@ -83,13 +81,13 @@ void drawStakes()
 
 void drawRings()
 {
-  for (int i = 0; i < TOWERS; i++)
+  for (int tower = 0; tower < TOWERS; tower++)
   {
-    for (int j = 0; j < stakes[i].topStake; j++)
+    for (int stake = 0; stake < stakes[tower].topStake; stake++)
     {
-      int ringWidth = RING_HEIGHT + stakes[i].rings[j] * RING_BASE_WIDTH;
-      int ringX = i * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) - ringWidth / 2;
-      int ringY = gfx_screenHeight() - (j + 1) * RING_HEIGHT;
+      int ringWidth = RING_HEIGHT + stakes[tower].rings[stake] * RING_BASE_WIDTH;
+      int ringX = tower * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) - ringWidth / 2;
+      int ringY = gfx_screenHeight() - (stake + 1) * RING_HEIGHT;
 
       gfx_filledRect(ringX, ringY, ringX + ringWidth, ringY + RING_HEIGHT, RED);
     }
@@ -173,14 +171,10 @@ int main(int argc, char *argv[])
     }
 
     if (event == SDLK_ESCAPE)
-    {
       exit(0);
-    }
 
     if (gameCompleted)
-    {
       displayWinMessage();
-    }
 
     if (gameCompleted && event == SDLK_RETURN)
     {
