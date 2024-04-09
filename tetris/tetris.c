@@ -12,13 +12,17 @@
 #define ROWS 20
 #define BLOCK_SIZE 30
 #define OFFSET 1
-const int INITIAL_BAG[7] = {0, 1, 2, 3, 4, 5, 6};
+#define EMPTY 0
+#define TETROMINO_AMOUNT 7
+#define TETROMINO_SIZE 4
+#define TETROMINO_ROTATIONS 4
+const int INITIAL_BAG[TETROMINO_AMOUNT] = {0, 1, 2, 3, 4, 5, 6};
 
 int clearedLines = 0;
 int lastTetrimino = 0;
 int event = 0;
 
-int bag[7] = {0, 1, 2, 3, 4, 5, 6};
+int bag[TETROMINO_AMOUNT] = {0, 1, 2, 3, 4, 5, 6};
 int grid[ROWS][COLS];
 int moveDown = 0;
 int tetrominoIndex = 0;
@@ -27,7 +31,7 @@ double speed = 12;
 bool isGameOver = false;
 
 Tetromino *currentTetrimino;
-Tetromino tetriminos[7];
+Tetromino tetriminos[TETROMINO_AMOUNT];
 
 bool isInside(int row, int col)
 {
@@ -47,7 +51,7 @@ bool isRowFull(int row, int col)
 {
   for (int i = 0; i < COLS; i++)
   {
-    if (grid[row][i] == 0)
+    if (grid[row][i] == EMPTY)
     {
       return false;
     }
@@ -59,15 +63,15 @@ void clearRow(int row)
 {
   for (int i = 0; i < COLS; i++)
   {
-    grid[row][i] = 0;
+    grid[row][i] = EMPTY;
   }
 }
 
 bool canMoveDown()
 {
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < TETROMINO_SIZE; i++)
   {
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < TETROMINO_SIZE; j++)
     {
       if (currentTetrimino->positions[currentTetrimino->rotation_state][i][j] == 1)
       {
@@ -83,9 +87,9 @@ bool canMoveDown()
 
 bool canMoveLeft()
 {
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < TETROMINO_SIZE; i++)
   {
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < TETROMINO_SIZE; j++)
     {
       if (currentTetrimino->positions[currentTetrimino->rotation_state][i][j] == 1)
       {
@@ -101,9 +105,9 @@ bool canMoveLeft()
 
 bool canMoveRight()
 {
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < TETROMINO_SIZE; i++)
   {
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < TETROMINO_SIZE; j++)
     {
       if (currentTetrimino->positions[currentTetrimino->rotation_state][i][j] == 1)
       {
@@ -120,9 +124,9 @@ bool canMoveRight()
 void generateBag()
 {
   memcpy(bag, INITIAL_BAG, sizeof(bag));
-  for (int i = 0; i < 7; i++)
+  for (int i = 0; i < TETROMINO_AMOUNT; i++)
   {
-    int randomIndex = rand() % 7;
+    int randomIndex = rand() % TETROMINO_AMOUNT;
     int temp = bag[i];
     bag[i] = bag[randomIndex];
     bag[randomIndex] = temp;
@@ -131,9 +135,9 @@ void generateBag()
 
 bool canRotate()
 {
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < TETROMINO_SIZE; i++)
   {
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < TETROMINO_SIZE; j++)
     {
       if (currentTetrimino->positions[(currentTetrimino->rotation_state + 1) % 4][i][j] == 1)
       {
@@ -153,7 +157,7 @@ void drawGrid()
   {
     for (int j = 0; j < COLS; j++)
     {
-      if (grid[i][j] == 0)
+      if (grid[i][j] == EMPTY)
       {
         gfx_filledRect(j * BLOCK_SIZE + OFFSET, i * BLOCK_SIZE + OFFSET, (j + 1) * BLOCK_SIZE - 1 - OFFSET, (i + 1) * BLOCK_SIZE - 1 - OFFSET, WHITE);
       }
@@ -167,9 +171,9 @@ void drawGrid()
 
 void drawTetrimino(Tetromino tetrimino, int x, int y)
 {
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < TETROMINO_SIZE; i++)
   {
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < TETROMINO_SIZE; j++)
     {
       if (tetrimino.positions[tetrimino.rotation_state][i][j] == 1)
       {
@@ -188,7 +192,7 @@ void updateScreen()
 
 void canSpawnNext()
 {
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < TETROMINO_SIZE; i++)
   {
     for (int j = 0; j < COLS; j++)
     {
@@ -204,8 +208,6 @@ void canSpawnNext()
 void assignNextTetrimino()
 {
   canSpawnNext();
-
-  printBag();
 
   bool allZero = true;
 
@@ -241,9 +243,9 @@ void moveBlockDown()
   }
   else if (!canMoveDown())
   {
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < TETROMINO_SIZE; i++)
     {
-      for (int j = 0; j < 4; j++)
+      for (int j = 0; j < TETROMINO_SIZE; j++)
       {
         if (currentTetrimino->positions[currentTetrimino->rotation_state][i][j] == 1)
         {
@@ -303,7 +305,7 @@ void handleMovement(int event)
   case SDLK_UP:
     if (canRotate() == true)
     {
-      currentTetrimino->rotation_state = (currentTetrimino->rotation_state + 1) % 4;
+      currentTetrimino->rotation_state = (currentTetrimino->rotation_state + 1) % TETROMINO_SIZE;
     }
     break;
   case SDLK_DOWN:
@@ -315,18 +317,17 @@ void handleMovement(int event)
   case SDLK_ESCAPE:
     exit(0);
     break;
-  case SDLK_SPACE:
+  case SDLK_RETURN:
     if (isGameOver)
     {
-      memset(grid, 0, sizeof(grid[0][0]) * ROWS * COLS);
+      memset(grid, 0, sizeof(int) * ROWS * COLS);
       isGameOver = false;
     }
-    else
+    break;
+  case SDLK_SPACE:
+    while (canMoveDown())
     {
-      while (canMoveDown())
-      {
-        currentTetrimino->y++;
-      }
+      currentTetrimino->y++;
     }
   default:
     break;
@@ -372,9 +373,8 @@ int main(int argc, char *argv[])
     }
     else
     {
-      char gameOverText[50];
+      char gameOverText[50] = "GAME OVER. CLEARED LINES: %d";
       sprintf(gameOverText, "GAME OVER. CLEARED LINES: %d", clearedLines);
-      printf("%s\n", gameOverText);
       gfx_textout(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2, gameOverText, RED);
     }
   }
