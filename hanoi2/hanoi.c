@@ -1,11 +1,9 @@
 #include "primlib.h"
 #include <stdlib.h>
-#include <unistd.h>
-#include "math.h"
 
 // GAME SETTINGS
-#define TOWERS 5
-#define RINGS 6
+#define TOWERS 3
+#define RINGS 30
 
 // SDL CONSTANTS
 #define REFRESH_RATE 16.666666
@@ -13,14 +11,17 @@
 
 // TOWERS CONSTANTS
 #define STAKE_WIDTH 20
-#define STAKE_HEIGHT 400
+#define STAKE_HEIGHT (RINGS * RING_HEIGHT)
 
 // RINGS CONSTANTS
 #define RING_HEIGHT 20
 #define RING_BASE_WIDTH 20
+#define RING_MAX_WIDTH gfx_screenWidth() / (2 * TOWERS)
 
 // ANIMATION STATE-Y
 #define Y_MAX 100
+
+int event = -1;
 
 typedef struct
 {
@@ -59,9 +60,9 @@ void setupStakes()
 
 void checkWinCondition()
 {
-  for (int i = 1; i < TOWERS; i++)
+  for (int idx = 1; idx < TOWERS; idx++)
   {
-    if (stakes[i].topStake == RINGS)
+    if (stakes[idx].topStake == RINGS)
     {
       gameCompleted = 1;
     }
@@ -70,26 +71,26 @@ void checkWinCondition()
 
 void displayWinMessage()
 {
-  gfx_textout(gfx_screenWidth() / 2 - 50, Y_MAX, "Press ESC to exit or ENTER to restart", WHITE);
+  gfx_textout(gfx_screenWidth() / 2, Y_MAX, "Press ESC to exit or ENTER to restart", WHITE);
 }
 
 void drawStakes()
 {
-  for (int i = 0; i < TOWERS; i++)
+  for (int tower = 0; tower < TOWERS; tower++)
   {
-    gfx_filledRect(stakes[i].x1, stakes[i].y1, stakes[i].x2, stakes[i].y2, WHITE);
+    gfx_filledRect(stakes[tower].x1, stakes[tower].y1, stakes[tower].x2, stakes[tower].y2, WHITE);
   }
 }
 
 void drawRings()
 {
-  for (int i = 0; i < TOWERS; i++)
+  for (int tower = 0; tower < TOWERS; tower++)
   {
-    for (int j = 0; j < stakes[i].topStake; j++)
+    for (int stake = 0; stake < stakes[tower].topStake; stake++)
     {
-      int ringWidth = RING_HEIGHT + stakes[i].rings[j] * RING_BASE_WIDTH;
-      int ringX = i * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) - ringWidth / 2;
-      int ringY = gfx_screenHeight() - (j + 1) * RING_HEIGHT;
+      int ringWidth = RING_HEIGHT + stakes[tower].rings[stake] * RING_BASE_WIDTH;
+      int ringX = tower * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) - ringWidth / 2;
+      int ringY = gfx_screenHeight() - (stake + 1) * RING_HEIGHT;
 
       gfx_filledRect(ringX, ringY, ringX + ringWidth, ringY + RING_HEIGHT, RED);
     }
@@ -113,7 +114,8 @@ void animateMoveRing(int sourceStake, int targetStake)
   int ringY = gfx_screenHeight() - (ringIndex + 1) * RING_HEIGHT;
 
   int direction = 1;
-  if (targetStake < sourceStake) direction = -1;
+  if (targetStake < sourceStake)
+    direction = -1;
 
   while (ringY >= Y_MAX)
   {
@@ -135,58 +137,86 @@ void animateMoveRing(int sourceStake, int targetStake)
   }
 }
 
+int returnKey(int event)
+{
+  switch (event)
+  {
+  case SDLK_1:
+    return 1;
+    break;
+  case SDLK_2:
+    return 2;
+  case SDLK_3:
+    return 3;
+  case SDLK_4:
+    return 4;
+  case SDLK_5:
+    return 5;
+  case SDLK_6:
+    return 6;
+  case SDLK_7:
+    return 7;
+  case SDLK_8:
+    return 8;
+  case SDLK_9:
+    return 9;
+  case SDLK_0:
+    return 10;
+  default:
+    return -1;
+  }
+}
+
 int main(int argc, char *argv[])
 {
-  int event = 0;
+  int sourceStake = -1;
+
   if (gfx_init())
-  {
     exit(3);
-  }
 
   setupStakes();
-
-  int sourceStake = -1;
 
   while (1)
   {
     event = gfx_pollkey();
-
-    if (event >= '1' && event <= '0' + TOWERS)
-    {
-      int stake = event - '1';
-
-      if (sourceStake == -1)
-      {
-        if (stakes[stake].topStake > 0) sourceStake = stake;
-      }
-      else
-      {
-        if (stakes[stake].topStake < RINGS && (stakes[stake].topStake == 0 || stakes[stake].rings[stakes[stake].topStake - 1] > stakes[sourceStake].rings[stakes[sourceStake].topStake - 1]))
-        {
-          stakes[stake].rings[stakes[stake].topStake] = stakes[sourceStake].rings[stakes[sourceStake].topStake - 1];
-          stakes[sourceStake].topStake--;
-          animateMoveRing(sourceStake, stake);
-          stakes[stake].topStake++;
-          sourceStake = -1;
-        }
-      }
-    }
-
-    if (event == SDLK_ESCAPE)
-    {
-      exit(0);
-    }
-
-    if (gameCompleted)
-    {
-      displayWinMessage();
-    }
 
     if (gameCompleted && event == SDLK_RETURN)
     {
       setupStakes();
       gameCompleted = 0;
     }
+
+    if(event == SDLK_r)
+    {
+      sourceStake = -1;
+      event = -1;
+    }
+
+
+    event = returnKey(event);
+    if(event < 0 || event > TOWERS) event = -1;
+
+    if (event != -1)
+    {
+      int stake = event - 1;
+      int topStake = stakes[stake].topStake;
+
+      if (sourceStake == -1 && topStake > 0)
+      {
+        sourceStake = stake;
+      }
+      else if (sourceStake != -1 && topStake < RINGS && (topStake == 0 || stakes[stake].rings[topStake - 1] > stakes[sourceStake].rings[topStake - 1]))
+      {
+        stakes[stake].rings[topStake] = stakes[sourceStake].rings[stakes[sourceStake].topStake - 1];
+        stakes[sourceStake].topStake--;
+        animateMoveRing(sourceStake, stake);
+        stakes[stake].topStake++;
+        sourceStake = -1;
+      }
+    }
+
+    if (event == SDLK_ESCAPE) exit(0);
+    if (gameCompleted) displayWinMessage();
 
     updateScreen();
     checkWinCondition();
