@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.ts": "typescript",
+    "tetris.h": "c",
+    "grid.h": "c",
+    "stdbool.h": "c"
+  }
+}
