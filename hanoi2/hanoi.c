@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 // GAME SETTINGS
-#define TOWERS 3
-#define RINGS 30
+#define TOWERS 8
+#define RINGS 4
 
 // SDL CONSTANTS
 #define REFRESH_RATE 16.666666
@@ -11,15 +11,19 @@
 
 // TOWERS CONSTANTS
 #define STAKE_WIDTH 20
-#define STAKE_HEIGHT (RINGS * RING_HEIGHT)
+#define STAKE_HEIGHT 300
 
 // RINGS CONSTANTS
-#define RING_HEIGHT 20
+#define RING_HEIGHT STAKE_HEIGHT / RINGS
 #define RING_BASE_WIDTH 20
-#define RING_MAX_WIDTH gfx_screenWidth() / (2 * TOWERS)
+#define RING_MAX_WIDTH gfx_screenWidth() / (4 * TOWERS)
+
+#if RINGS > 100
+#error "RINGS can be up to 100"
+#endif
 
 // ANIMATION STATE-Y
-#define Y_MAX 100
+#define Y_MAX 10
 
 int event = -1;
 
@@ -88,7 +92,7 @@ void drawRings()
   {
     for (int stake = 0; stake < stakes[tower].topStake; stake++)
     {
-      int ringWidth = RING_HEIGHT + stakes[tower].rings[stake] * RING_BASE_WIDTH;
+      int ringWidth = RING_BASE_WIDTH + stakes[tower].rings[stake] * (RING_MAX_WIDTH / RING_BASE_WIDTH);
       int ringX = tower * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) - ringWidth / 2;
       int ringY = gfx_screenHeight() - (stake + 1) * RING_HEIGHT;
 
@@ -109,7 +113,7 @@ void updateScreen()
 void animateMoveRing(int sourceStake, int targetStake)
 {
   int ringIndex = stakes[sourceStake].topStake;
-  int ringWidth = RING_BASE_WIDTH + stakes[sourceStake].rings[ringIndex] * RING_BASE_WIDTH;
+  int ringWidth = RING_BASE_WIDTH + stakes[sourceStake].rings[ringIndex] * (RING_MAX_WIDTH / RING_BASE_WIDTH);
   int ringX = sourceStake * gfx_screenWidth() / TOWERS + gfx_screenWidth() / (TOWERS * 2) - ringWidth / 2;
   int ringY = gfx_screenHeight() - (ringIndex + 1) * RING_HEIGHT;
 
@@ -192,6 +196,8 @@ int main(int argc, char *argv[])
       event = -1;
     }
 
+    if (event == SDLK_ESCAPE) exit(0);
+
 
     event = returnKey(event);
     if(event < 0 || event > TOWERS) event = -1;
@@ -215,7 +221,6 @@ int main(int argc, char *argv[])
       }
     }
 
-    if (event == SDLK_ESCAPE) exit(0);
     if (gameCompleted) displayWinMessage();
 
     updateScreen();
