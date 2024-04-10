@@ -34,13 +34,13 @@ void updateScreen()
 
 void drawPolygon()
 {
-	for(int i = 0; i <= VERTICES; i++)
+	for(int idx = 0; idx <= VERTICES; idx++)
 		{
 			int x1, x2, y1, y2;
-			x1 = centerX + radius * SDL_cos(toRadians(i * ALPHA) + beta);
-			y1 = centerY + radius * SDL_sin(toRadians(i * ALPHA) + beta);
-			x2 = centerX + radius * SDL_cos(toRadians((i + 1) * ALPHA) + beta);
-			y2 = centerY + radius * SDL_sin(toRadians(((i + 1) * ALPHA)) + beta);
+			x1 = centerX + radius * SDL_cos(toRadians(idx * ALPHA) + beta);
+			y1 = centerY + radius * SDL_sin(toRadians(idx * ALPHA) + beta);
+			x2 = centerX + radius * SDL_cos(toRadians((idx + 1) * ALPHA) + beta);
+			y2 = centerY + radius * SDL_sin(toRadians(((idx + 1) * ALPHA)) + beta);
 
 			gfx_line(x1, y1, x2, y2, GREEN);
 		}

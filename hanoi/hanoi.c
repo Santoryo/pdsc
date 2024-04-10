@@ -54,9 +54,9 @@ void setupStakes()
     if (idx == 0)
     {
       stakes[idx].topStake = RINGS;
-      for (int j = 0; j < RINGS; j++)
+      for (int idx2 = 0; idx2 < RINGS; idx2++)
       {
-        stakes[idx].rings[j] = RINGS - j;
+        stakes[idx].rings[idx2] = RINGS - idx2;
       }
     }
   }

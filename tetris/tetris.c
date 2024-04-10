@@ -18,6 +18,11 @@
 #define TETROMINO_ROTATIONS 4
 #define SPOT 1
 #define PIVOT 2
+
+#define DOWN 1
+#define LEFT -1
+#define RIGHT 1
+
 const int INITIAL_BAG[TETROMINO_AMOUNT] = {0, 1, 2, 3, 4, 5, 6};
 
 int clearedLines = 0;
@@ -50,11 +55,11 @@ bool isEmpty(int row, int col)
   return false;
 }
 
-bool isRowFull(int row, int col)
+bool isRowFull(int row)
 {
-  for (int i = 0; i < COLS; i++)
+  for (int col = 0; col < COLS; col++)
   {
-    if (grid[row][i] == EMPTY)
+    if (grid[row][col] == EMPTY)
     {
       return false;
     }
@@ -64,21 +69,21 @@ bool isRowFull(int row, int col)
 
 void clearRow(int row)
 {
-  for (int i = 0; i < COLS; i++)
+  for (int col = 0; col < COLS; col++)
   {
-    grid[row][i] = EMPTY;
+    grid[row][col] = EMPTY;
   }
 }
 
 bool canMoveDown()
 {
-  for (int i = 0; i < TETROMINO_SIZE; i++)
+  for (int row = 0; row < TETROMINO_SIZE; row++)
   {
-    for (int j = 0; j < TETROMINO_SIZE; j++)
+    for (int col = 0; col < TETROMINO_SIZE; col++)
     {
-      if (currentTetrimino->positions[currentTetrimino->rotation_state][i][j] == SPOT)
+      if (currentTetrimino->positions[currentTetrimino->rotation_state][row][col] == SPOT)
       {
-        if (!isEmpty(currentTetrimino->y + i + 1, currentTetrimino->x + j))
+        if (!isEmpty(currentTetrimino->y + row + 1, currentTetrimino->x + col))
         {
           return false;
         }
@@ -88,15 +93,15 @@ bool canMoveDown()
   return true;
 }
 
-bool canMoveLeft()
+bool canMoveTo(int targetX, int targetY)
 {
-  for (int i = 0; i < TETROMINO_SIZE; i++)
+  for (int row = 0; row < TETROMINO_SIZE; row++)
   {
-    for (int j = 0; j < TETROMINO_SIZE; j++)
+    for (int col = 0; col < TETROMINO_SIZE; col++)
     {
-      if (currentTetrimino->positions[currentTetrimino->rotation_state][i][j] == SPOT)
+      if (currentTetrimino->positions[currentTetrimino->rotation_state][row][col] == SPOT)
       {
-        if (!isEmpty(currentTetrimino->y + i, currentTetrimino->x + j - 1))
+        if (!isEmpty(currentTetrimino->y + row + targetY, currentTetrimino->x + col + targetX))
         {
           return false;
         }
@@ -108,13 +113,13 @@ bool canMoveLeft()
 
 bool canMoveRight()
 {
-  for (int i = 0; i < TETROMINO_SIZE; i++)
+  for (int row = 0; row < TETROMINO_SIZE; row++)
   {
-    for (int j = 0; j < TETROMINO_SIZE; j++)
+    for (int col = 0; col < TETROMINO_SIZE; col++)
     {
-      if (currentTetrimino->positions[currentTetrimino->rotation_state][i][j] == SPOT)
+      if (currentTetrimino->positions[currentTetrimino->rotation_state][row][col] == SPOT)
       {
-        if (!isEmpty(currentTetrimino->y + i, currentTetrimino->x + j + 1))
+        if (!isEmpty(currentTetrimino->y + row, currentTetrimino->x + col + 1))
         {
           return false;
         }
@@ -127,24 +132,24 @@ bool canMoveRight()
 void generateBag()
 {
   memcpy(bag, INITIAL_BAG, sizeof(bag));
-  for (int i = 0; i < TETROMINO_AMOUNT; i++)
+  for (int row = 0; row < TETROMINO_AMOUNT; row++)
   {
     int randomIndex = rand() % TETROMINO_AMOUNT;
-    int temp = bag[i];
-    bag[i] = bag[randomIndex];
+    int temp = bag[row];
+    bag[row] = bag[randomIndex];
     bag[randomIndex] = temp;
   }
 }
 
 bool canRotate()
 {
-  for (int i = 0; i < TETROMINO_SIZE; i++)
+  for (int row = 0; row < TETROMINO_SIZE; row++)
   {
-    for (int j = 0; j < TETROMINO_SIZE; j++)
+    for (int col = 0; col < TETROMINO_SIZE; col++)
     {
-      if (currentTetrimino->positions[(currentTetrimino->rotation_state + 1) % 4][i][j] == SPOT)
+      if (currentTetrimino->positions[(currentTetrimino->rotation_state + 1) % 4][row][col] == SPOT)
       {
-        if (!isEmpty(currentTetrimino->y + i, currentTetrimino->x + j))
+        if (!isEmpty(currentTetrimino->y + row, currentTetrimino->x + col))
         {
           return false;
         }
@@ -156,17 +161,17 @@ bool canRotate()
 
 void drawGrid()
 {
-  for (int i = 0; i < ROWS; i++)
+  for (int row = 0; row < ROWS; row++)
   {
-    for (int j = 0; j < COLS; j++)
+    for (int col = 0; col < COLS; col++)
     {
-      if (grid[i][j] == EMPTY)
+      if (grid[row][col] == EMPTY)
       {
-        gfx_filledRect(j * BLOCK_SIZE + OFFSET, i * BLOCK_SIZE + OFFSET, (j + 1) * BLOCK_SIZE - 1 - OFFSET, (i + 1) * BLOCK_SIZE - 1 - OFFSET, WHITE);
+        gfx_filledRect(col * BLOCK_SIZE + OFFSET, row * BLOCK_SIZE + OFFSET, (col + 1) * BLOCK_SIZE - 1 - OFFSET, (row + 1) * BLOCK_SIZE - 1 - OFFSET, WHITE);
       }
       else
       {
-        gfx_filledRect(j * BLOCK_SIZE + OFFSET, i * BLOCK_SIZE + OFFSET, (j + 1) * BLOCK_SIZE - 1 - OFFSET, (i + 1) * BLOCK_SIZE - 1 - OFFSET, grid[i][j]);
+        gfx_filledRect(col * BLOCK_SIZE + OFFSET, row * BLOCK_SIZE + OFFSET, (col + 1) * BLOCK_SIZE - 1 - OFFSET, (row + 1) * BLOCK_SIZE - 1 - OFFSET, grid[row][col]);
       }
     }
   }
@@ -174,17 +179,19 @@ void drawGrid()
 
 void drawTetrimino(Tetromino tetrimino, int x, int y)
 {
-  for (int i = 0; i < TETROMINO_SIZE; i++)
+  for (int row = 0; row < TETROMINO_SIZE; row++)
   {
-    for (int j = 0; j < TETROMINO_SIZE; j++)
+    for (int col = 0; col < TETROMINO_SIZE; col++)
     {
-      if (tetrimino.positions[tetrimino.rotation_state][i][j] == SPOT)
+      if (tetrimino.positions[tetrimino.rotation_state][row][col] == SPOT)
       {
-        gfx_filledRect((j + x + tetrimino.x) * BLOCK_SIZE + OFFSET, (i + y + tetrimino.y) * BLOCK_SIZE + OFFSET, (j + x + 1 + tetrimino.x) * BLOCK_SIZE - 1 - OFFSET, (i + y + 1 + tetrimino.y) * BLOCK_SIZE - 1 - OFFSET, currentTetrimino->color);
+        gfx_filledRect((col + x + tetrimino.x) * BLOCK_SIZE + OFFSET, 
+          (row + y + tetrimino.y) * BLOCK_SIZE + OFFSET, (col + x + 1 + tetrimino.x) * 
+          BLOCK_SIZE - 1 - OFFSET, (row + y + 1 + tetrimino.y) * BLOCK_SIZE - 1 - OFFSET, currentTetrimino->color);
       }
-      if (tetrimino.positions[tetrimino.rotation_state][i][j] == PIVOT)
+      if (tetrimino.positions[tetrimino.rotation_state][row][col] == PIVOT)
       {
-        gfx_filledRect((j + x + tetrimino.x) * BLOCK_SIZE + OFFSET, (i + y + tetrimino.y) * BLOCK_SIZE + OFFSET, (j + x + 1 + tetrimino.x) * BLOCK_SIZE - 1 - OFFSET, (i + y + 1 + tetrimino.y) * BLOCK_SIZE - 1 - OFFSET, CYAN);
+        gfx_filledRect((col + x + tetrimino.x) * BLOCK_SIZE + OFFSET, (row + y + tetrimino.y) * BLOCK_SIZE + OFFSET, (col + x + 1 + tetrimino.x) * BLOCK_SIZE - 1 - OFFSET, (row + y + 1 + tetrimino.y) * BLOCK_SIZE - 1 - OFFSET, CYAN);
       }
     }
   }
@@ -199,11 +206,11 @@ void updateScreen()
 
 void canSpawnNext()
 {
-  for (int i = 0; i < TETROMINO_SIZE; i++)
+  for (int row = 0; row < TETROMINO_SIZE; row++)
   {
-    for (int j = 0; j < COLS; j++)
+    for (int col = 0; col < COLS; col++)
     {
-      if (grid[i][j] != 0)
+      if (grid[row][col] != 0)
       {
         isGameOver = true;
         return;
@@ -218,12 +225,12 @@ void assignNextTetrimino()
 
   bool allZero = true;
 
-  for(int i = 0; i < 7; i++)
+  for(int row = 0; row < 7; row++)
   {
-    if(bag[i] != -1)
+    if(bag[row] != -1)
     {
-      tetrominoIndex = bag[i];
-      bag[i] = -1;
+      tetrominoIndex = bag[row];
+      bag[row] = -1;
       allZero = false;
       break;
     }
@@ -250,13 +257,13 @@ void moveBlockDown()
   }
   else if (!canMoveDown())
   {
-    for (int i = 0; i < TETROMINO_SIZE; i++)
+    for (int row = 0; row < TETROMINO_SIZE; row++)
     {
-      for (int j = 0; j < TETROMINO_SIZE; j++)
+      for (int col = 0; col < TETROMINO_SIZE; col++)
       {
-        if (currentTetrimino->positions[currentTetrimino->rotation_state][i][j] != EMPTY)
+        if (currentTetrimino->positions[currentTetrimino->rotation_state][row][col] != EMPTY)
         {
-          grid[currentTetrimino->y + i][currentTetrimino->x + j] = currentTetrimino->color;
+          grid[currentTetrimino->y + row][currentTetrimino->x + col] = currentTetrimino->color;
         }
       }
     }
@@ -276,17 +283,17 @@ void increaseSpeed()
 
 void checkRows()
 {
-  for (int i = 0; i < ROWS; i++)
+  for (int row = 0; row < ROWS; row++)
   {
-    if (isRowFull(i, 0))
+    if (isRowFull(row))
     {
-      clearRow(i);
+      clearRow(row);
       increaseSpeed();
-      for (int j = i; j > 0; j--)
+      for (int col = row; col > 0; col--)
       {
         for (int k = 0; k < COLS; k++)
         {
-          grid[j][k] = grid[j - 1][k];
+          grid[col][k] = grid[col - 1][k];
         }
       }
     }
@@ -301,26 +308,26 @@ void rotatePiece()
   int tempX = currentTetrimino->x;
   int tempY = currentTetrimino->y;
 
-  for(int i = 0; i < TETROMINO_SIZE; i++)
+  for(int row = 0; row < TETROMINO_SIZE; row++)
   {
-    for(int j = 0; j < TETROMINO_SIZE; j++)
+    for(int col = 0; col < TETROMINO_SIZE; col++)
     {
-      if(currentTetrimino->positions[currentTetrimino->rotation_state][i][j] == PIVOT)
+      if(currentTetrimino->positions[currentTetrimino->rotation_state][row][col] == PIVOT)
       {
-        x = j;
-        y = i;
+        x = col;
+        y = row;
       }
     }
   }
 
-  for(int i = 0; i < TETROMINO_SIZE; i++)
+  for(int row = 0; row < TETROMINO_SIZE; row++)
   {
-    for(int j = 0; j < TETROMINO_SIZE; j++)
+    for(int col = 0; col < TETROMINO_SIZE; col++)
     {
-      if(currentTetrimino->positions[(currentTetrimino->rotation_state + 1) % TETROMINO_ROTATIONS][i][j] == PIVOT)
+      if(currentTetrimino->positions[(currentTetrimino->rotation_state + 1) % TETROMINO_ROTATIONS][row][col] == PIVOT)
       {
-        newX = j;
-        newY = i;
+        newX = col;
+        newY = row;
       }
     }
   }
