@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.ts": "typescript",
+    "errno.h": "c",
+    "ctype.h": "c"
+  }
+}
