@@ -5,6 +5,8 @@
 
 #define ALLOC_SIZE 20
 
+// Leo Ryba 252575
+
 void raiseError() 
 {
     printf("Error in memory allocation\n");
@@ -21,7 +23,10 @@ char* getLine()
     while (1) 
     {
         character = getchar();
-        if (character == EOF || character == '\n') break;
+        if (character == '\n' || character == EOF) 
+        {
+            break;
+        }
 
         line[size++] = character;
         if (size == allocatedSize) 

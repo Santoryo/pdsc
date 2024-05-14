@@ -1,10 +1,6 @@
-# List your *.h files (if you do not have them in your project then leave the variable "headers" empty):
 headers = rand_malloc.h
-
-# List your *.c files:
 sources = text.c rand_malloc.c 
 
-# Specify name of your program:
 executable = text
 
 $(executable): $(headers) $(sources)

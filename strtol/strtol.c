@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+// Leo Ryba 252575
+
 long strtol(const char *nPtr, char **endPtr, int base)
 {
 	const char *currentPtr = nPtr;
@@ -47,13 +49,13 @@ long strtol(const char *nPtr, char **endPtr, int base)
 
 	switch (*currentPtr)
 	{
-	case '-':
-		isPositive = false;
-		currentPtr++;
-		break;
-	case '+':
-		currentPtr++;
-		break;
+		case '-':
+			isPositive = false;
+			currentPtr++;
+			break;
+		case '+':
+			currentPtr++;
+			break;
 	}
 
 	// Base
@@ -62,6 +64,7 @@ long strtol(const char *nPtr, char **endPtr, int base)
 	{
 		currentPtr += 2;
 	}
+
 	if (base == 8 && *currentPtr == '0')
 	{
 		currentPtr++;
@@ -73,6 +76,7 @@ long strtol(const char *nPtr, char **endPtr, int base)
 		base = (*currentPtr == 'X' || *currentPtr == 'x') ? 16 : 8;
 		if (base == 16) currentPtr++;
 	}
+
 	else if(base == 0)
 	{
 		base = 10;
