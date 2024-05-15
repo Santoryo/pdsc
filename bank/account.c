@@ -233,12 +233,8 @@ Account filterAccounts(char* column, char* value, bool isReturnNeeded)
     if (line)
         free(line);
 
-    if(accountToReturn.id == 0)
-    {
-        error("Account not found");
-    }
 
-    if(!isReturnNeeded)
+    if(!isReturnNeeded && accountToReturn.id != 0)
     {
         free(accountToReturn.firstName);
         free(accountToReturn.lastName);
@@ -246,6 +242,72 @@ Account filterAccounts(char* column, char* value, bool isReturnNeeded)
         free(accountToReturn.pesel);
     }
 
+    if(accountToReturn.id == 0)
+    {
+        error("Account not found");
+    }
+
     return accountToReturn;
 
+}
+
+void payLoan(int id, int amount)
+{
+    FILE *file = fopen(FILENAME, "r");
+
+    if(file == NULL) {
+        error("File does not exist");
+        return;
+    }
+
+    FILE *tempFile = fopen("temp.csv", "w");
+
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    bool found = false;
+
+    while ((read = getline(&line, &len, file)) != -1) {
+        char* idStr = strtok(line, ";");
+        char* firstName = strtok(NULL, ";");
+        char* lastName = strtok(NULL, ";");
+        char* address = strtok(NULL, ";");
+        char* pesel = strtok(NULL, ";");
+        char* currentBalanceStr = strtok(NULL, ";");
+        char* loanBalanceStr = strtok(NULL, ";");
+        char* loanInterestStr = strtok(NULL, ";");
+
+        int currentBalance = atoi(currentBalanceStr);
+        int loanBalance = atoi(loanBalanceStr);
+        int loanInterest = atoi(loanInterestStr);
+
+        if(atoi(idStr) == id)
+        {
+            found = true;
+            loanBalance -= amount * (1 + loanInterest / 100);
+            currentBalance -= amount * (1 + loanInterest / 100);
+        }
+
+        fprintf(tempFile, "%s;%s;%s;%s;%s;%d;%d;%d\n", 
+        idStr, firstName, lastName, address, pesel, currentBalance, loanBalance, loanInterest);
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    remove(FILENAME);
+    rename("temp.csv", FILENAME);
+
+    if(found)
+    {
+        info("Loan paid successfully");
+    }
+    else
+    {
+        error("Account not found");
+    }
+
+    if (line)
+        free(line);
 }
