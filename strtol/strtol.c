@@ -6,165 +6,201 @@
 
 // Leo Ryba 252575
 
+const char* skipWhiteSpaces(const char *currentPtr);
+bool checkSign(const char **currentPtr);
+int determineBase(const char **currentPtr, int base);
+int convertCharToNumber(char c, int base);
+bool checkOverflow(long finalValue, int current_number, int base, bool isPositive);
+void handleOverflow(const char **currentPtr, char **endPtr, bool isPositive);
+
 long strtol(const char *nPtr, char **endPtr, int base)
 {
-	const char *currentPtr = nPtr;
-	int current_number;
-	long finalValue = 0;
-	
-	bool isPositive = true;
-	bool isEmptyString = true;
-	bool isOverflow = false;
+    const char *currentPtr = nPtr;
+    int current_number;
+    long finalValue = 0;
+    
+    bool isPositive = true;
+    bool isEmptyString = true;
+    bool isOverflow = false;
 
-	// Check if nPtr is NULL
-	if (nPtr == NULL)
-	{
-		errno = EINVAL;
-		return 0;
-	}
+    // Check if nPtr is NULL
+    if (nPtr == NULL)
+    {
+        errno = EINVAL;
+        return 0;
+    }
 
-	if (*currentPtr == '\0')
-	{
-		if (endPtr)
-			*endPtr = (char *)currentPtr;
-		return 0;
-	}
+    if (*currentPtr == '\0')
+    {
+        if (endPtr)
+            *endPtr = (char *)currentPtr;
+        return 0;
+    }
 
-	// Check if base is valid
+    // Check if base is valid
+    if (base != 0 && (base < 2 || base > 36))
+    {
+        errno = EINVAL;
+        return 0;
+    }
 
-	if (base != 0 && (base < 2 || base > 36))
-	{
-		errno = EINVAL;
-		return 0;
-	}
+    currentPtr = skipWhiteSpaces(currentPtr);
 
-	// Skip white spaces
+    isPositive = checkSign(&currentPtr);
 
-	while (isspace(*currentPtr))
-	{
-		currentPtr++;
-	}
+    base = determineBase(&currentPtr, base);
 
-	// Check if the number is positive or negative
+    // Convert the string to a number
+    while (*currentPtr != '\0')
+    {
+        current_number = convertCharToNumber(*currentPtr, base);
+        if (current_number == -1)
+            break;
 
-	switch (*currentPtr)
-	{
-		case '-':
-			isPositive = false;
-			currentPtr++;
-			break;
-		case '+':
-			currentPtr++;
-			break;
-	}
+        isOverflow = checkOverflow(finalValue, current_number, base, isPositive);
 
-	// Base
+        // Check for overflow
+        if (isOverflow)
+        {
+            handleOverflow(&currentPtr, endPtr, isPositive);
+            return isPositive ? LONG_MAX : LONG_MIN;
+        }
 
-	if (base == 16 && *currentPtr == '0' && (*(currentPtr + 1) == 'X' || *(currentPtr + 1) == 'x'))
-	{
-		currentPtr += 2;
-	}
+        if (isPositive)
+        {
+            finalValue = finalValue * base + current_number;
+        }
+        else
+        {
+            finalValue = finalValue * base - current_number;
+        }
+        currentPtr++;
+        isEmptyString = false;
+    }
 
-	if (base == 8 && *currentPtr == '0')
-	{
-		currentPtr++;
-	}
+    // Check if the string is empty
+    if (isEmptyString)
+    {
+        if (base == 8 || base == 16)
+        {
+            if (base == 16)
+                currentPtr--;
+            if (endPtr)
+            {
+                *endPtr = (char *)currentPtr;
+            }
+        }
+        return 0;
+    }
 
-	if (base == 0 && *currentPtr == '0')
-	{
-		currentPtr++;
-		base = (*currentPtr == 'X' || *currentPtr == 'x') ? 16 : 8;
-		if (base == 16) currentPtr++;
-	}
+	// Set endPtr to the end of the string if it is not NULL
+    if (endPtr)
+    {
+        *endPtr = (char *)currentPtr;
+    }
 
-	else if(base == 0)
-	{
-		base = 10;
-	}
+    return finalValue;
+}
 
-	// Convert the string to a number
+// Skip white spaces
+const char* skipWhiteSpaces(const char *currentPtr)
+{
+    while (isspace(*currentPtr))
+    {
+        currentPtr++;
+    }
+    return currentPtr;
+}
 
-	while (*currentPtr != '\0')
-	{
-		if (isdigit(*currentPtr) && (*currentPtr - '0') < base)
-		{
-			current_number = *currentPtr - '0';
-		}
-		else if (isalpha(*currentPtr) && (toupper(*currentPtr) - 'A' + 10) < base)
-		{
-			current_number = toupper(*currentPtr) - 'A' + 10;
-		}
-		else
-		{
-			break;
-		}
+// Check if the number is positive or negative
+bool checkSign(const char **currentPtr)
+{
+    bool isPositive = true;
+    switch (**currentPtr)
+    {
+        case '-':
+            isPositive = false;
+            (*currentPtr)++;
+            break;
+        case '+':
+            (*currentPtr)++;
+            break;
+    }
+    return isPositive;
+}
 
-		if (finalValue > (LONG_MAX - current_number) / base || finalValue < (LONG_MIN + current_number) / base)
-		{
-			isOverflow = true;
-		}
+// Determine base
+int determineBase(const char **currentPtr, int base)
+{
+    if (base == 16 && **currentPtr == '0' && (*(*currentPtr + 1) == 'X' || *(*currentPtr + 1) == 'x'))
+    {
+        *currentPtr += 2;
+    }
+    else if (base == 8 && **currentPtr == '0')
+    {
+        (*currentPtr)++;
+    }
+    else if (base == 0)
+    {
+        if (**currentPtr == '0')
+        {
+            (*currentPtr)++;
+            base = (**currentPtr == 'X' || **currentPtr == 'x') ? 16 : 8;
+            if (base == 16) (*currentPtr)++;
+        }
+        else
+        {
+            base = 10;
+        }
+    }
+    return base;
+}
 
-		// Check for overflow
+// Convert character to number
+int convertCharToNumber(char c, int base)
+{
+    if (isdigit(c) && (c - '0') < base)
+    {
+        return c - '0';
+    }
+    else if (isalpha(c) && (toupper(c) - 'A' + 10) < base)
+    {
+        return toupper(c) - 'A' + 10;
+    }
+    else
+    {
+        return -1; // Invalid character for the given base
+    }
+}
 
-		if (isOverflow)
-		{
-			while (*currentPtr != '\0')
-			{
-				currentPtr++;
-				if (!isdigit(*currentPtr) && !isalpha(*currentPtr))
-				{
-					break;
-				}
-			}
+// Check for overflow
+bool checkOverflow(long finalValue, int current_number, int base, bool isPositive)
+{
+    if (isPositive)
+    {
+        return finalValue > (LONG_MAX - current_number) / base;
+    }
+    else
+    {
+        return finalValue < (LONG_MIN + current_number) / base;
+    }
+}
 
-			if (endPtr)
-			{
-				*endPtr = (char *)currentPtr;
-			}
-			errno = ERANGE;
+// Handle overflow
+void handleOverflow(const char **currentPtr, char **endPtr, bool isPositive)
+{
+    while (**currentPtr != '\0')
+    {
+        (*currentPtr)++;
+        if (!isdigit(**currentPtr) && !isalpha(**currentPtr))
+        {
+            break;
+        }
+    }
 
-			switch (isPositive)
-			{
-				case true:
-					return LONG_MAX;
-				case false:
-					return LONG_MIN;
-			}
-		}
-
-		if (isPositive)
-		{
-			finalValue = finalValue * base + current_number;
-		}
-		else
-		{
-			finalValue = finalValue * base - current_number;
-		}
-		currentPtr++;
-		isEmptyString = false;
-	}
-
-	// Check if the string is empty
-
-	if (isEmptyString && base != 8 && base != 16)
-	{
-		return 0;
-	}
-
-	if (isEmptyString && base == 16)
-	{
-		currentPtr--;
-		if (endPtr)
-		{
-			*endPtr = (char *)currentPtr;
-		}
-		return 0;
-	}
-
-	if (endPtr)
-	{
-		*endPtr = (char *)currentPtr;
-	}
-
-	return finalValue;
+    if (endPtr)
+    {
+        *endPtr = (char *)*currentPtr;
+    }
+    errno = ERANGE;
 }
