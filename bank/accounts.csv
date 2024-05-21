@@ -1,22 +1,22 @@
-1;Jan;Kowalski;ul.Lipowa 10,Krakow;85010212345;100100;250;0
-2;Anna;Nowak;ul.Debowa 5,Gdansk;90030467891;6699900;320;0
-3;Piotr;Wisniewski;ul.Sloneczna 3,Wroclaw;75121987654;4300000;150;0
-4;Katarzyna;Dabrowska;ul.Polna 8,Lodz;82060123456;8900000;420;0
-6;Magdalena;Wozniak;ul. Brzozowa 7, Katowice;91051534567;7800000;290;0
-7;Krzysztof;Kaminski;ul. Wiosenna 4, Szczecin;82070278901;5500000;180;0
-8;Barbara;Kowalczyk;ul. Miodowa 6, Lublin;76080134567;6900000;310;0
-10;Agnieszka;Szymanska;ul. Topolowa 11, Gdynia;84060623456;5700000;220;0
-11;Marek;Wozniak;ul. Zielona 9, Warszawa;89010145678;7300000;340;0
-12;Joanna;Kaczmarek;ul. Kwiatowa 2, Krakow;91121287654;6100000;280;0
-13;Jan;Piotrowski;ul. Ogrodowa 3, Wroclaw;85020278901;4900000;230;0
-14;Monika;Grabowska;ul. Szkolna 14, Lodz;78050612345;6800000;300;0
-15;Pawel;Pawlak;ul. Lesna 16, Poznan;91030334567;5400000;190;0
-16;Iwona;Michalska;ul. Klonowa 17, Katowice;80070867890;6400000;270;0
-17;Rafal;Adamczyk;ul. Rzeczna 18, Szczecin;85030323456;5000000;240;0
-18;Beata;Nowakowska;ul. Olszyna 19, Lublin;90010178901;7600000;310;0
-19;Grzegorz;Jablonki;ul. Parkowa 20, Bydgoszcz;84020287654;6000000;260;0
-20;Ewa;Krol;ul. Slowianska 21, Gdynia;88030312345;5800000;250;0
-21;Ryszard;Wieczorek;ul. Jasna 22, Warszawa;79010167890;7200000;330;0
-22;Elzbieta;Malinowska;ul. Skladowa 23, Krakow;90010178902;4800000;210;0
-23;Dariusz;Pajak;ul. Sosnowa 24, Gdansk;81121234567;6600000;290;0
-24;Jolanta;Gajewska;ul. Kwiatowa 25, Wroclaw;85030345678;5200000;230;0
+1;Jan;Kowalski;ul.Lipowa 10,Krakow;85010212345;97800;0;200
+2;Anna;Nowak;ul.Debowa 5,Gdansk;90030467891;6717372;0;500
+3;Piotr;Wisniewski;ul.Sloneczna 3,Wroclaw;75121987654;4300000;150;330
+4;Katarzyna;Dabrowska;ul.Polna 8,Lodz;82060123456;8900000;420;100
+6;Magdalena;Wozniak;ul. Brzozowa 7, Katowice;91051534567;7800000;290;600
+7;Krzysztof;Kaminski;ul. Wiosenna 4, Szczecin;82070278901;5500000;180;123
+8;Barbara;Kowalczyk;ul. Miodowa 6, Lublin;76080134567;6900000;310;200
+10;Agnieszka;Szymanska;ul. Topolowa 11, Gdynia;84060623456;5700000;220;500
+11;Marek;Wozniak;ul. Zielona 9, Warszawa;89010145678;7300000;340;500
+12;Joanna;Kaczmarek;ul. Kwiatowa 2, Krakow;91121287654;6100000;280;500
+13;Jan;Piotrowski;ul. Ogrodowa 3, Wroclaw;85020278901;4900000;230;500
+14;Monika;Grabowska;ul. Szkolna 14, Lodz;78050612345;6800000;300;500
+15;Pawel;Pawlak;ul. Lesna 16, Poznan;91030334567;5400000;190;500
+16;Iwona;Michalska;ul. Klonowa 17, Katowice;80070867890;6400000;270;500
+17;Rafal;Adamczyk;ul. Rzeczna 18, Szczecin;85030323456;5000000;240;500
+18;Beata;Nowakowska;ul. Olszyna 19, Lublin;90010178901;7600000;310;500
+19;Jacek;Jablonki;ul. Parkowa 20, Bydgoszcz;84020287654;6000000;260;500
+20;Ewa;Krol;ul. Slowianska 21, Gdynia;88030312345;5800000;250;500
+21;Ryszard;Wieczorek;ul. Jasna 22, Warszawa;79010167890;7200000;330;500
+22;Elzbieta;Malinowska;ul. Skladowa 23, Krakow;90010178902;4800000;210;500
+23;Dariusz;Pajak;ul. Sosnowa 24, Gdansk;81121234567;6600000;290;500
+24;Jolanta;Gajewska;ul. Kwiatowa 25, Wroclaw;85030345678;5200000;230;500

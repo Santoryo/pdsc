@@ -1,4 +1,4 @@
-sources = account.h account.c filehandler.c filehandler.h logger.h logger.c main.c
+sources = account.h account.c filehandler.c filehandler.h logger.h logger.c utils.h utils.c main.c
 
 executable = banking
 

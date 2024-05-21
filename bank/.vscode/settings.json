@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "*.ts": "typescript",
-        "account.h": "c",
-        "filehandler.h": "c",
-        "stdbool.h": "c"
-    },
-    "C_Cpp.errorSquiggles": "disabled"
-}

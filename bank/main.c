@@ -7,36 +7,7 @@
 #include "filehandler.h"
 #include "constants.h"
 #include "logger.h"
-
-bool validate(char *value, int len, char *message)
-{
-    if (value == NULL || strlen(value) < len)
-    {
-        error(message);
-        return false;
-    }
-    return true;
-}
-
-bool validatePESEL(char *value)
-{
-    if (strlen(value) != 11)
-    {
-        error("PESEL has to be 11 characters long");
-        return false;
-    }
-    return true;
-}
-
-bool validateInt(char *value, char *message)
-{
-    if (value == NULL || atoi(value) <= 0)
-    {
-        error(message);
-        return false;
-    }
-    return true;
-}
+#include "utils.h"
 
 bool askForConfirmation()
 {
@@ -115,7 +86,7 @@ void createHandler()
     if (buffer[0] == '\0')
     {
         warning("Loan interest not provided, setting to default value");
-        account.loanInterest = 0;
+        account.loanInterest = DEFAULT_LOAN_INTEREST;
     }
     else
     {
@@ -166,6 +137,7 @@ void depositHandler()
         return;
 
     makeDeposit(atoi(id), atoi(amount));
+    
 }
 
 void loanPayoffHandler()
@@ -188,7 +160,7 @@ void loanPayoffHandler()
     if (!askForConfirmation())
         return;
 
-    makeDeposit(atoi(id), client.loanBalance * -1);
+    payLoan(atoi(id), client.loanBalance);
     free(client.firstName);
     free(client.lastName);
     free(client.address);
@@ -225,6 +197,73 @@ void withdrawHandler()
     }
 
     makeDeposit(atoi(id), atoi(amount) * -1);
+    free(client.firstName);
+    free(client.lastName);
+    free(client.address);
+    free(client.pesel);
+}
+
+void transferHandler()
+{
+    char *senderId = strtok(NULL, " ");
+    if (senderId == NULL)
+    {
+        error("Please provide an account ID to transfer from");
+        return;
+    }
+
+    char *receiptientId = strtok(NULL, " ");
+    if (receiptientId == NULL)
+    {
+        error("Please provide an account ID to transfer to");
+        return;
+    }
+
+    char *amount = strtok(NULL, " ");
+    if (amount == NULL)
+    {
+        error("Please provide an amount to transfer");
+        return;
+    }
+
+    if (!validateInt(amount, "Amount has to be a positive number"))
+        return;
+    if (!askForConfirmation())
+        return;
+
+    transferMoney(senderId, receiptientId, amount);
+}
+
+void takeLoanHandler()
+{
+    char *id = strtok(NULL, " ");
+    if (id == NULL)
+    {
+        error("Please provide an account ID to take a loan from");
+        return;
+    }
+
+    char *amount = strtok(NULL, " ");
+    if (amount == NULL)
+    {
+        error("Please provide an amount to take a loan");
+        return;
+    }
+
+    if (!validateInt(amount, "Amount has to be a positive number"))
+        return;
+    if (!askForConfirmation())
+        return;
+
+    Account client = filterAccounts("id", id, true);
+
+    if (client.loanBalance > 0)
+    {
+        error("Loan already taken");
+        return;
+    }
+
+    takeLoan(atoi(id), atoi(amount));
     free(client.firstName);
     free(client.lastName);
     free(client.address);
@@ -276,9 +315,17 @@ int main(void)
         {
             cleanTerminal();
         }
-        else if(strcmp("payoff") == 0)
+        else if(strcmp("payoff", token) == 0)
         {
             loanPayoffHandler();
+        }
+        else if(strcmp("transfer", token) == 0)
+        {
+            transferHandler();
+        }
+        else if(strcmp("takeloan", token) == 0)
+        {
+            takeLoanHandler();
         }
         else
         {

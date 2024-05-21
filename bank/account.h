@@ -28,8 +28,10 @@ void createAccount(Account account);
 void displayAccount(Account account);
 void displayAccountWrapper(Account account);
 void getAllAccounts();
-void filter(Account account, char *column, char *value);
 Account filterAccounts(char* column, char* value, bool isReturnNeeded);
 void makeDeposit(int id, int amount);
+void payLoan(int id, int amount);
+void transferMoney(char* senderId, char* receiptientId, char* amount);
+void takeLoan(int id, int amount);
 
 #endif // ACCOUNT_H
