@@ -3,7 +3,7 @@ sources = account.h account.c filehandler.c filehandler.h logger.h logger.c util
 executable = banking
 
 $(executable): $(headers) $(sources)
-	gcc -g -Wall -pedantic $(sources) -o $(executable)
+	gcc -fsanitize=undefined -g -Wall -pedantic $(sources) -o $(executable)
 
 test: $(headers) $(sources) $(executable)
 	gcc -g -Wall -pedantic $(sources) -o $(executable)

@@ -280,6 +280,10 @@ int main(void)
 
         fgets(command, 1024, stdin);
         command[strcspn(command, "\n")] = 0;
+
+        if(command[0] == '\0')
+            continue;
+
         token = strtok(command, " ");
 
         if (strcmp("create", token) == 0 || strcmp("c", token) == 0)

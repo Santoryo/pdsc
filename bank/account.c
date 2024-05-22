@@ -84,7 +84,51 @@ void displayHeaader() {
 void getAllAccounts()
 {
     displayHeaader();
-    parseFile(displayAccountWrapper);
+
+    FILE *file = fopen(FILENAME, "r");
+
+    if(file == NULL) {
+        error("File does not exist");
+        return;
+    }
+
+    while(1) {
+        Account account;
+        char *line = NULL;
+        size_t len = 0;
+        ssize_t read;
+
+        read = getline(&line, &len, file);
+        if(read == -1) {
+            break;
+        }
+
+        char* id = strtok(line, ";");
+        char* firstName = strtok(NULL, ";");
+        char* lastName = strtok(NULL, ";");
+        char* address = strtok(NULL, ";");
+        char* pesel = strtok(NULL, ";");
+        char* currentBalance = strtok(NULL, ";");
+        char* loanBalance = strtok(NULL, ";");
+        char* loanInterest = strtok(NULL, ";");
+
+        account.id = atoi(id);
+        account.firstName = strcpy(malloc(strlen(firstName) + 1), firstName);
+        account.lastName = strcpy(malloc(strlen(lastName) + 1), lastName);
+        account.address = strcpy(malloc(strlen(address) + 1), address);
+        account.pesel = strcpy(malloc(strlen(pesel) + 1), pesel);
+        account.currentBalance = atoi(currentBalance);
+        account.loanBalance = atoi(loanBalance);
+        account.loanInterest = atoi(loanInterest);
+
+        displayAccount(account);
+
+        free(account.firstName);
+        free(account.lastName);
+        free(account.address);
+        free(account.pesel);
+    }
+
     displayBorder();
 }
 

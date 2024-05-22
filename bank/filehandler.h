@@ -5,7 +5,6 @@
 #include <stdbool.h>
 
 void createFile(char *filename);
-void parseFile(void (*func)(Account));
 void raiseError(char *message);
 bool checkIfFileExists(char *filename);
 

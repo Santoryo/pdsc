@@ -3,6 +3,7 @@
     "*.ts": "typescript",
     "tetris.h": "c",
     "grid.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "unistd.h": "c"
   }
 }
