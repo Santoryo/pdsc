@@ -1,49 +1,73 @@
 #include <stdio.h>
 
-void *bsearch(const void *key, const void *base, size_t num, size_t size, int (*compar)(const void *, const void *)) {
+// Binary search function to find element in a sorted array.
+// Returns a pointer to the found element or NULL if not found.
+void *bsearch(const void *key, const void *base, size_t num, size_t size, int (*compar)(const void *, const void *))
+{
     size_t low = 0;
     size_t high = num - 1;
 
-    while (low <= high) {
+    while (low <= high)
+    {
         size_t mid = (low + high) / 2;
-        const void *mid_elem = (const char *)base + mid * size;
-        int cmp_result = compar(key, mid_elem);
+        const void *middle = (const char *)base + mid * size;
+        int outputResult = compar(key, middle);
 
-        if (cmp_result == 0) {
-            return (void *)mid_elem;
-        } else if (cmp_result < 0) {
-            high = mid - 1;
-        } else {
-            low = mid + 1;
+        switch (outputResult)
+        {
+            case 0:
+                return (void *)middle;
+            case -1:
+                // Target is smaller, so we search in the left half
+                high = mid - 1;
+                break;
+            default:
+                // Target is larger, so we search in the right half
+                low = mid + 1;
+                break;
         }
     }
 
     return NULL;
 }
 
-int compare_ints(const void *a, const void *b) {
-    int int_a = *(int *)a;
-    int int_b = *(int *)b;
-    if (int_a < int_b) return -1;
-    if (int_a > int_b) return 1;
-    return 0;
+int compareInts(const void *a, const void *b)
+{
+    return (*(int *)a > *(int *)b) - (*(int *)a < *(int *)b);
 }
 
-int compare_chars(const void *a, const void *b) {
-    char char_a = *(const char *)a;
-    char char_b = *(const char *)b;
-    return (char_a > char_b) - (char_a < char_b);
+int compareChars(const void *a, const void *b)
+{
+    return (*(const char *)a > *(const char *)b) - (*(const char *)a < *(const char *)b);
 }
 
-int main() {
+int main()
+{
+    // Char array
     char arr[] = {'a', 'b', 'c', 'd', 'e'};
-    char key = 'c';
-    char *found = (char *)bsearch(&key, arr, sizeof(arr)/sizeof(arr[0]), sizeof(char), compare_chars);
+    char key = 'd';
+    char *found = (char *)bsearch(&key, arr, sizeof(arr)/sizeof(arr[0]), sizeof(char), compareChars);
 
-    // Check if the element was found
-    if (found) {
-        printf("Element found: %d\n", *found);
-    } else {
+    if (found)
+    {
+        printf("Element found: %c\n", *found);
+    }
+    else
+    {
+        printf("Element not found\n");
+    }
+
+    // Int array
+    int arr2[] = {1, 2, 3, 4, 5};
+    int key2 = 2;
+    int *found2 = (int *)bsearch(&key2, arr2, sizeof(arr2)/sizeof(arr2[0]), sizeof(int), compareInts);
+
+    if (found2)
+    {
+        printf("Element found: %d\n", *found2);
+    }
+    else
+    {
         printf("Element not found\n");
     }
 
