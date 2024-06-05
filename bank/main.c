@@ -136,7 +136,7 @@ void depositHandler()
     if (!askForConfirmation())
         return;
 
-    makeDeposit(atoi(id), atoi(amount));
+    makeDeposit(atoi(id), atof(amount) * 100.0f);
     
 }
 
@@ -160,7 +160,7 @@ void loanPayoffHandler()
     if (!askForConfirmation())
         return;
 
-    payLoan(atoi(id), client.loanBalance);
+    payLoan(atoi(id), atof(client.loanBalance) * 100.0f);
     free(client.firstName);
     free(client.lastName);
     free(client.address);
