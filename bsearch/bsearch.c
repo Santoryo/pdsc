@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 // Binary search function to find element in a sorted array.
 // Returns a pointer to the found element or NULL if not found.
@@ -38,7 +39,24 @@ int compareInts(const void *a, const void *b)
 
 int compareChars(const void *a, const void *b)
 {
-    return (*(const char *)a > *(const char *)b) - (*(const char *)a < *(const char *)b);
+    return (*(char *)a > *(char *)b) - (*(char *)a < *(char *)b);
+}
+
+int compareFloats(const void *a, const void *b)
+{
+    float diff = *(float *)a - *(float *)b;
+    return (diff > 0) - (diff < 0);
+}
+
+typedef struct
+{
+    int id;
+    char name[20];
+} Person;
+
+int comparePeople(const void *a, const void *b)
+{
+    return ((Person *)a)->id - ((Person *)b)->id;
 }
 
 int main()
@@ -50,7 +68,7 @@ int main()
 
     if (found)
     {
-        printf("Element found: %c\n", *found);
+        printf("Element found: %c, Index: %ld\n", *found, found - arr);
     }
     else
     {
@@ -64,7 +82,35 @@ int main()
 
     if (found2)
     {
-        printf("Element found: %d\n", *found2);
+        printf("Element found: %d, Index: %ld\n", *found2, found2 - arr2);
+    }
+    else
+    {
+        printf("Element not found\n");
+    }
+
+    // Float array
+    float arr3[] = {1.1, 2.2, 3.3, 4.4, 5.5};
+    float key3 = 4.4;
+    float *found3 = (float *)bsearch(&key3, arr3, sizeof(arr3)/sizeof(arr3[0]), sizeof(float), compareFloats);
+
+    if (found3)
+    {
+        printf("Element found: %.1f, Index: %ld\n", *found3, found3 - arr3);
+    }
+    else
+    {
+        printf("Element not found\n");
+    }
+
+    // Array of structs
+    Person arr4[] = {{1, "Kacper"}, {2, "Jakub"}, {3, "Marek"}, {4, "Agata"}, {5, "Ewelina"}, {6, "Kamil"}};
+    Person key4 = {6, ""}; // Search by id
+    Person *found4 = (Person *)bsearch(&key4, arr4, sizeof(arr4)/sizeof(arr4[0]), sizeof(Person), comparePeople);
+
+    if (found4)
+    {
+        printf("Element found: %d %s, Index: %ld\n", found4->id, found4->name, found4 - arr4);
     }
     else
     {
