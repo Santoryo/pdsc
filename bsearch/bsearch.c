@@ -1,48 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 // Leo Ryba 252575
 // Binary search function to find element in a sorted array.
 // Returns a pointer to the found element or NULL if not found.
 void *bsearch(const void *key, const void *base, size_t num, size_t size, int (*compar)(const void *, const void *))
 {
-    size_t low = 0;
-    size_t high = num - 1;
+    ssize_t low = 0;
+    ssize_t high = num - 1;
 
     while (low <= high)
     {
-        size_t mid = (low + high) / 2;
+        ssize_t mid = (low + high) / 2;
         const void *middle = (const char *)base + mid * size;
         int outputResult = compar(key, middle);
 
-        // switch (outputResult)
-        // {
-        //     case 0:
-        //         return (void *)middle;
-        //     case -1:
-        //         // Target is smaller, so we search in the left half
-        //         high = mid - 1;
-        //         break;
-        //     default:
-        //         // Target is larger, so we search in the right half
-        //         low = mid + 1;
-        //         break;
-        // }
-
-        if (outputResult == 0)
+        switch (outputResult)
         {
-            return (void *)middle;
-        }
-        else if (outputResult < 0)
-        {
-            // Target is smaller, so we search in the left half
-            high = mid - 1;
-        }
-        else
-        {
-            // Target is larger, so we search in the right half
-            low = mid + 1;
+            case 0:
+                return (void *)middle;
+            case -1:
+                // Target is smaller, so we search in the left half
+                high = mid - 1;
+                break;
+            default:
+                // Target is larger, so we search in the right half
+                low = mid + 1;
+                break;
         }
     }
 
@@ -87,7 +73,7 @@ int main()
     printf("Char tests:\n");
 
     char arr[] = {'a', 'b', 'c', 'd', 'e'};
-    char key = 'd';
+    char key = 'a';
     char *found = (char *)bsearch(&key, arr, sizeof(arr)/sizeof(arr[0]), sizeof(char), compareChars);
 
     printf("Searching for: %c\n", key);
@@ -104,7 +90,7 @@ int main()
 
     printf("\nInteger tests:\n");
     // Int array
-    int arr2[] = {-1, 1, 2, 3, 4, 5, 6};
+    int arr2[] = {-3, -1, 1, 2, 3, 4, 5, 6};
     int key2 = -1;
     int *found2 = (int *)bsearch(&key2, arr2, sizeof(arr2)/sizeof(arr2[0]), sizeof(int), compareInts);
 
@@ -138,8 +124,10 @@ int main()
 
     // Float array
     float arr3[] = {0.01, 0.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 33.33};
-    float key3 = 4.4;
+    float key3 = -4.4;
     float *found3 = (float *)bsearch(&key3, arr3, sizeof(arr3)/sizeof(arr3[0]), sizeof(float), compareFloats);
+
+    printf("Searching for: %.1f\n", key3);
 
     if (found3)
     {
