@@ -3,7 +3,6 @@
 #include <string.h>
 #include <sys/types.h>
 
-// Leo Ryba 252575
 // Binary search function to find element in a sorted array.
 // Returns a pointer to the found element or NULL if not found.
 void *bsearch(const void *key, const void *base, size_t num, size_t size, int (*compar)(const void *, const void *))
