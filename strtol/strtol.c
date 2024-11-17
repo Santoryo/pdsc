@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-// Leo Ryba 252575
-
 const char* skipWhiteSpaces(const char *currentPtr);
 bool checkSign(const char **currentPtr);
 int determineBase(const char **currentPtr, int base);
